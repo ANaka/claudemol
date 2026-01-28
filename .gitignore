@@ -111,3 +111,4 @@ dmypy.json
 settings.json
 .mcp.json*.cif
 *.pdb
+scratch/

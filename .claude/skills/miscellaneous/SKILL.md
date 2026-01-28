@@ -621,6 +621,27 @@ for atom in model.atom:
     print(f"{atom.resn} {atom.resi} {atom.name}")
 ```
 
+### Iterate with Atom Properties
+
+Available properties: `name`, `resn`, `resi`, `chain`, `b` (B-factor), `q` (occupancy), `ss` (secondary structure), `elem`, `x`, `y`, `z`
+
+```python
+# Get secondary structure assignments
+helices = []
+cmd.iterate("name CA", "helices.append(resi) if ss=='H' else None",
+            space={"helices": helices})
+
+# Get B-factors
+bfactors = []
+cmd.iterate("name CA", "bfactors.append(b)", space={"bfactors": bfactors})
+avg_b = sum(bfactors) / len(bfactors)
+
+# Find low occupancy atoms
+low_occ = []
+cmd.iterate("all", "low_occ.append((resi, name)) if q < 1.0 else None",
+            space={"low_occ": low_occ})
+```
+
 ---
 
 ## Pseudoatoms and Markers

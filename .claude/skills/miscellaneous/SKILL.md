@@ -560,8 +560,56 @@ for atom in model.atom:
 
 ---
 
+## Pseudoatoms and Markers
+
+### Create Marker at Center of Mass
+
+```python
+com = cmd.centerofmass("selection")
+cmd.pseudoatom("marker", pos=com)
+cmd.show("spheres", "marker")
+cmd.color("red", "marker")
+cmd.set("sphere_scale", 1.0, "marker")
+```
+
+### Create Origin Marker
+
+```python
+cmd.pseudoatom("origin", pos=[0, 0, 0])
+cmd.show("spheres", "origin")
+cmd.color("blue", "origin")
+```
+
+## Bounding Box
+
+### Get Extent (Bounding Box)
+
+```python
+extent = cmd.get_extent("selection")
+# extent = [[min_x, min_y, min_z], [max_x, max_y, max_z]]
+print("Min: " + str(extent[0]))
+print("Max: " + str(extent[1]))
+```
+
+### Calculate Box Size
+
+```python
+extent = cmd.get_extent("selection")
+size = [extent[1][i] - extent[0][i] for i in range(3)]
+print("Box dimensions: " + str([round(s, 1) for s in size]))
+```
+
+### Calculate Box Center
+
+```python
+extent = cmd.get_extent("selection")
+center = [(extent[0][i] + extent[1][i]) / 2 for i in range(3)]
+print("Box center: " + str([round(c, 1) for c in center]))
+```
+
+---
+
 ## TODO: Patterns to Add
 
 - Map fitting and isosurface
-- Custom CGO objects
-- Cation-pi interactions
+- Custom CGO objects for box visualization

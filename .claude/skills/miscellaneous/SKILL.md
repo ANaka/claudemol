@@ -97,6 +97,15 @@ cmd.enable("object_name")   # Show again
 cmd.toggle("object_name")   # Toggle visibility
 ```
 
+### Group Objects
+
+```python
+cmd.group("group_name", "obj1 obj2 obj3")
+cmd.disable("group_name")  # Disable entire group
+cmd.enable("group_name")   # Enable entire group
+cmd.ungroup("group_name")  # Remove group (keeps objects)
+```
+
 ### Show As (Hide Others)
 
 ```python

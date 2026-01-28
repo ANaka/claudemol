@@ -259,11 +259,107 @@ count = cmd.count_atoms("your_selection_here")
 print("Matched atoms: " + str(count))
 ```
 
+## Metal and Cofactor Visualization
+
+### Select Metals
+
+```python
+cmd.select("metals", "elem Cu+Fe+Zn+Mg+Mn+Ca")
+cmd.show("spheres", "metals")
+cmd.color("orange", "metals")
+```
+
+### Select Heme Groups
+
+```python
+cmd.select("heme", "resn HEM+HEC+HEA")
+cmd.show("sticks", "heme")
+```
+
+### Coordination Sphere
+
+```python
+cmd.select("coord_sphere", "byres (polymer.protein within 3 of metals)")
+cmd.show("sticks", "coord_sphere")
+cmd.color("yellow", "coord_sphere and elem C")
+```
+
+## Residue Property Selection
+
+### By Charge
+
+```python
+cmd.select("basic", "resn ARG+LYS+HIS")
+cmd.select("acidic", "resn ASP+GLU")
+cmd.select("charged", "resn ARG+LYS+HIS+ASP+GLU")
+```
+
+### By Hydrophobicity
+
+```python
+cmd.select("hydrophobic", "resn ALA+VAL+ILE+LEU+MET+PHE+TRP+PRO")
+cmd.select("polar", "resn SER+THR+CYS+TYR+ASN+GLN")
+```
+
+### Color by Property
+
+```python
+cmd.color("blue", "resn ARG+LYS+HIS")      # Basic (positive)
+cmd.color("red", "resn ASP+GLU")            # Acidic (negative)
+cmd.color("yellow", "hydrophobic")          # Hydrophobic
+cmd.color("cyan", "polar")                   # Polar uncharged
+```
+
+---
+
+## NMR Ensemble Handling
+
+### Check Number of States
+
+```python
+states = cmd.count_states("object_name")
+print("States: " + str(states))
+```
+
+### Show All States Overlaid
+
+```python
+cmd.set("all_states", 1)  # Overlay all states
+cmd.set("all_states", 0)  # Show one state at a time
+```
+
+### Create Movie Through States
+
+```python
+n_states = cmd.count_states("object_name")
+cmd.mset("1 -" + str(n_states))  # Each frame = one state
+cmd.mplay()  # Start playback
+```
+
+### Style for Ensemble Visualization
+
+```python
+cmd.set("all_states", 1)
+cmd.show("lines", "all")
+cmd.set("line_width", 1)
+cmd.color("gray70", "all")
+# Highlight specific state
+cmd.set("state", 1)
+cmd.color("red", "all")
+```
+
+---
+
+## Known Limitations
+
+- **cmd.morph()** may not work reliably through socket connection
+- **Electrostatic surfaces** require APBS or similar external tools
+- **Some wizard operations** may need interactive PyMOL
+
 ---
 
 ## TODO: Patterns to Add
 
-- Electrostatic surface mapping
 - Map fitting and isosurface
 - Custom CGO objects
-- Plugins and scripts
+- Distance matrix visualization

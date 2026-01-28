@@ -275,3 +275,72 @@ Branch: `autodidact-improvements`
 - Added command definitions to PYMOL_COMMANDS dict
 - Added handlers in build_pymol_code() for proper output
 
+---
+
+## Session 3: Advanced Patterns
+
+### Experiment 11: Multi-Chain Structures
+**Time:** 2026-01-28
+**Structure:** 2occ (cytochrome c oxidase, 26 chains)
+**Results:**
+- Chain iteration works: `cmd.iterate("all and name CA", "chains.append(chain)")`
+- `util.cbc` colors all chains distinctly
+- Metal selection: `elem Cu+Fe+Zn+Mg+Mn+Ca`
+- Heme selection: `resn HEM+HEC+HEA`
+- Coordination sphere: `byres (polymer.protein within 3 of metals)`
+
+**Learned:**
+- Use `space={"chains": chains}` parameter for iterate to pass external list
+- Multi-chain proteins benefit from util.cbc for quick overview
+
+---
+
+### Experiment 12: Residue Property Selection
+**Time:** 2026-01-28
+**Results:**
+- Basic residues: `resn ARG+LYS+HIS`
+- Acidic residues: `resn ASP+GLU`
+- Hydrophobic: `resn ALA+VAL+ILE+LEU+MET+PHE+TRP+PRO`
+- Polar: `resn SER+THR+CYS+TYR+ASN+GLN`
+
+**Learned:**
+- PyMOL uses `+` to separate residue names in `resn`
+- Standard amino acid groupings work well for property-based coloring
+
+---
+
+### Experiment 13: NMR Ensembles
+**Time:** 2026-01-28
+**Structure:** 1d3z (10-state NMR ensemble)
+**Results:**
+- `cmd.count_states()` returns number of states
+- `cmd.set("all_states", 1)` shows all states overlaid
+- `cmd.mset("1 -10")` creates movie through all states
+
+**Learned:**
+- NMR structures automatically load all states
+- Movie setup: `mset("1 -N")` where N is number of states
+
+---
+
+### Experiment 14: Structure Morphing (Failed)
+**Time:** 2026-01-28
+**Structures:** 1ake, 4ake (adenylate kinase open/closed)
+**Results:**
+- Both have 428 CA atoms
+- RMSD after alignment: 18.49 Å (large conformational change)
+- `cmd.morph()` failed silently through socket
+
+**Learned:**
+- Morph command may have issues through socket execution
+- Needs further investigation or may require interactive PyMOL
+- Large conformational changes (>10 Å RMSD) may need special handling
+
+---
+
+## Known Limitations
+
+1. **cmd.morph()** - May not work reliably through socket
+2. **surface_color_mode** - Setting doesn't exist (tested, failed)
+3. **Some wizard operations** - May require interactive mode
+

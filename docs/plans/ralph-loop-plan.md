@@ -12,6 +12,19 @@ Build a robust, self-improving PyMOL integration where Claude becomes a capable 
 - Well-organized repo
 - Tests that verify capabilities
 - An agent that can launch/close PyMOL without problems, recover from crashes, and see visual outputs effectively
+- **Publication-quality figures** - not just "did it load" but "would this go in a paper"
+
+## Quality Standard (Added 2026-01-28)
+
+**Each curriculum task should produce PUBLICATION QUALITY output:**
+
+1. Ray-traced rendering (not OpenGL snapshots)
+2. Thoughtful camera angles showing biological relevance
+3. Multiple views when appropriate (overview + detail)
+4. Consistent, meaningful color schemes
+5. Proper resolution (300 DPI, sufficient dimensions)
+
+**The goal is not to check boxes, but to build genuine expertise in molecular visualization.**
 
 ---
 

@@ -162,3 +162,27 @@ cmd.png(path, width, height)
 
 **Current Status:** 8/25 Tier 2 tasks complete (32%)
 **Overall:** Tier 1 (95%) + Tier 2 (32% in progress)
+
+### 2026-01-28: Shift to Quality Focus
+
+**Key Realization:** Rushing through tasks to "check boxes" doesn't build real expertise.
+
+**New approach:**
+- Focus on **publication-quality** figures, not just "did it load"
+- Create multiple views (overview + detail) for each visualization
+- Ray-trace everything at 300 DPI
+- Document the biological story each figure tells
+
+**Redid with quality focus:**
+- Task 38 (CDR loops): 3 figures - overview, paratope view, surface
+- Task 34 (Ligand binding): 2 figures - overview, binding site close-up
+
+**New artifacts:**
+- `docs/learnings/publication-figures.md` - Guidelines for pub-quality work
+- `docs/learnings/visualization-categories.md` - Key categories to master
+
+**Next:** Rather than racing through tasks, deeply master key visualization types:
+1. Ligand binding
+2. Structural comparisons
+3. Antibody/immunology
+4. Protein structure basics

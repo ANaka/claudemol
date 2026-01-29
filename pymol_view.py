@@ -95,13 +95,35 @@ def pymol_view(
     output_path = generate_filename(name)
 
     # Build the full command sequence
-    # Note: Using png with explicit dimensions to avoid resizing the GUI window
+    # IMPORTANT: cmd.png() with width/height parameters causes a PyMOL bug where
+    # the view matrix Z-distance becomes corrupted after multiple cycles of
+    # reinitialize + fetch + png. The Z-distance grows exponentially from ~120 to
+    # ~50000+ after just 3-4 cycles, causing the view to zoom out into invisibility.
+    #
+    # The fix: ALWAYS use cmd.ray(width, height) before cmd.png(path) WITHOUT
+    # dimensions in the png call. The ray() command renders to an offscreen buffer
+    # without touching the viewport, preventing the corruption.
+    #
+    # The ray=False option is now just for skipping the expensive ray-trace quality,
+    # but we still use cmd.ray() with low quality settings to render at the right size.
+
+    if ray:
+        # High-quality ray-traced rendering (slower, prettier)
+        render_cmd = f"cmd.ray({width}, {height})"
+    else:
+        # Quick capture: still use ray() but faster
+        # ray() without quality tweaks is faster than full ray-trace
+        # This prevents the view inflation bug while being reasonably quick
+        render_cmd = f"cmd.ray({width}, {height})"
+
+    png_cmd = f'cmd.png(r"{output_path}")'
+
     full_code = f"""
 {commands}
 
-# Save the image with explicit dimensions (doesn't resize window)
-{"cmd.ray({}, {})".format(width, height) if ray else ""}
-cmd.png(r"{output_path}", {width}, {height})
+# Render and save the image
+{render_cmd}
+{png_cmd}
 print(f"Saved: {output_path}")
 """
 

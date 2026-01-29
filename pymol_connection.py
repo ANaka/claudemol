@@ -18,11 +18,20 @@ DEFAULT_PORT = 9880  # Changed from 9876 due to zombie process holding that port
 CONNECT_TIMEOUT = 5.0
 RECV_TIMEOUT = 30.0
 
-# Common PyMOL installation paths on macOS
-MACOS_PYMOL_PATHS = [
+# Common PyMOL installation paths
+PYMOL_PATHS = [
+    # uv environment (created by /pymol-setup)
+    os.path.expanduser("~/.pymol-env/bin/python"),
+    # macOS app locations
     "/Applications/PyMOL.app/Contents/MacOS/PyMOL",
     os.path.expanduser("~/Applications/PyMOL.app/Contents/MacOS/PyMOL"),
+    # Linux system locations
+    "/usr/bin/pymol",
+    "/usr/local/bin/pymol",
 ]
+
+# Flag to indicate we need to use "python -m pymol" instead of direct executable
+_USE_PYTHON_MODULE = False
 
 
 class PyMOLConnection:
@@ -120,25 +129,53 @@ class PyMOLConnection:
         raise ConnectionError("Failed to connect after 3 attempts")
 
 
-def find_pymol_executable():
-    """Find PyMOL executable path."""
+def find_pymol_command():
+    """
+    Find how to launch PyMOL.
+
+    Returns:
+        List of command arguments (e.g., ["pymol"] or ["python", "-m", "pymol"])
+        or None if PyMOL is not found.
+    """
     # Check if pymol is in PATH
     pymol_path = shutil.which("pymol")
     if pymol_path:
-        return pymol_path
+        return [pymol_path]
 
-    # Check macOS app locations
-    if sys.platform == "darwin":
-        for path in MACOS_PYMOL_PATHS:
-            if os.path.isfile(path) and os.access(path, os.X_OK):
-                return path
+    # Check uv environment first (most common for this project)
+    uv_python = os.path.expanduser("~/.pymol-env/bin/python")
+    if os.path.isfile(uv_python) and os.access(uv_python, os.X_OK):
+        # Verify pymol is installed in this environment
+        try:
+            result = subprocess.run(
+                [uv_python, "-c", "import pymol"],
+                capture_output=True,
+                timeout=5,
+            )
+            if result.returncode == 0:
+                return [uv_python, "-m", "pymol"]
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            pass
+
+    # Check other common paths
+    for path in PYMOL_PATHS:
+        if path.endswith("/python"):
+            continue  # Already checked uv environment above
+        if os.path.isfile(path) and os.access(path, os.X_OK):
+            return [path]
 
     return None
 
 
+def find_pymol_executable():
+    """Find PyMOL executable path (legacy compatibility)."""
+    cmd = find_pymol_command()
+    return cmd[0] if cmd else None
+
+
 def check_pymol_installed():
     """Check if pymol command is available."""
-    return find_pymol_executable() is not None
+    return find_pymol_command() is not None
 
 
 def launch_pymol(file_path=None, wait_for_socket=True, timeout=10.0):
@@ -153,18 +190,21 @@ def launch_pymol(file_path=None, wait_for_socket=True, timeout=10.0):
     Returns:
         subprocess.Popen process handle
     """
-    pymol_exe = find_pymol_executable()
-    if not pymol_exe:
+    pymol_cmd = find_pymol_command()
+    if not pymol_cmd:
         raise RuntimeError(
-            "PyMOL not found. Please install PyMOL and ensure it is in your PATH "
-            "or installed at /Applications/PyMOL.app (macOS)."
+            "PyMOL not found. Please install PyMOL:\n"
+            "  - Run /pymol-setup for guided installation\n"
+            "  - Or: pip install pymol-open-source-whl\n"
+            "  - Or: brew install pymol (macOS)"
         )
 
     plugin_path = Path(__file__).parent / "claude_socket_plugin.py"
     if not plugin_path.exists():
         raise RuntimeError(f"Plugin not found: {plugin_path}")
 
-    cmd_args = [pymol_exe]
+    # Build command: base pymol command + optional file + plugin
+    cmd_args = list(pymol_cmd)
     if file_path:
         cmd_args.append(str(file_path))
     cmd_args.extend(["-d", f"run {plugin_path}"])

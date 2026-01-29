@@ -95,12 +95,19 @@ def pymol_view(
     output_path = generate_filename(name)
 
     # Build the full command sequence
-    # Note: Using png with explicit dimensions to avoid resizing the GUI window
+    # Note: cmd.ray() is for high-quality ray-traced images (slower)
+    # For non-ray images, cmd.png() alone captures the current view
+    # Avoiding cmd.draw() as it can cause GUI glitches and view corruption
+    if ray:
+        render_cmd = f"cmd.ray({width}, {height})"
+    else:
+        render_cmd = ""  # Skip draw - png() captures current GL state
+
     full_code = f"""
 {commands}
 
-# Save the image with explicit dimensions (doesn't resize window)
-{"cmd.ray({}, {})".format(width, height) if ray else ""}
+# Render and save the image
+{render_cmd}
 cmd.png(r"{output_path}", {width}, {height})
 print(f"Saved: {output_path}")
 """

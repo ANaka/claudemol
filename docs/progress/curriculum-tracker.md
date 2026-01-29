@@ -6,15 +6,15 @@ Tracking progress through the PyMOL agent curricula.
 
 | Tier | Target Pass Rate | Current | Status |
 |------|------------------|---------|--------|
-| Basic (1-20) | >90% | 0/20 | Not started |
-| Intermediate (21-45) | >80% | 0/25 | Not started |
+| Basic (1-20) | >90% | 19/20 (95%) | Complete |
+| Intermediate (21-45) | >80% | 8/25 | In progress |
 | Advanced (46-70) | >60% | 0/25 | Not started |
 | Expert (71-85) | >40% | 0/15 | Not started |
 
 ## Prerequisites
 
 Before curriculum work:
-- [ ] Phase 1 foundation complete (session management, visual feedback)
+- [x] Phase 1 foundation complete (session management, visual feedback)
 
 ---
 
@@ -22,26 +22,26 @@ Before curriculum work:
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 1 | Fetch and display protein (1UBQ) | - | |
-| 2 | Change representation types | - | |
-| 3 | Color by chain (1HHO) | - | |
-| 4 | Create and use selections (1BL8) | - | |
-| 5 | Zoom on region of interest | - | |
-| 6 | Measure distance between atoms | - | |
-| 7 | Remove water molecules | - | |
-| 8 | Select binding site residues | - | |
-| 9 | Color by secondary structure | - | |
-| 10 | Save session and export image | - | |
-| 11 | Surface with transparency | - | |
-| 12 | Identify hydrogen bonds | - | |
-| 13 | Align two structures | - | |
-| 14 | Extract chain to new object | - | |
-| 15 | Label residues | - | |
-| 16 | Color by B-factor | - | |
-| 17 | Show disulfide bonds | - | |
-| 18 | Sequence viewer navigation | - | |
-| 19 | Create rotation movie | - | |
-| 20 | Save cleaned structure | - | |
+| 1 | Fetch and display protein (1UBQ) | P | Cartoon visible, waters present |
+| 2 | Change representation types | P | Cartoon + sidechain sticks |
+| 3 | Color by chain (1HHO) | P | Used 2HHB (4 chains vs 2) |
+| 4 | Create and use selections (1BL8) | P | 20 CA atoms in selectivity filter |
+| 5 | Zoom on region of interest | P | Catalytic triad in 1TRN |
+| 6 | Measure distance between atoms | P | 2.8Å Ser-His distance in 4CHA |
+| 7 | Remove water molecules | P | 127→0 waters, ligand retained |
+| 8 | Select binding site residues | P | 4EIY has lipids affecting count |
+| 9 | Color by secondary structure | P | Myoglobin red helices/green loops |
+| 10 | Save session and export image | P | GFP ray-traced + .pse session |
+| 11 | Surface with transparency | P | Use cmd.set("transparency", 0.5, obj) |
+| 12 | Identify hydrogen bonds | P | mode=2 polar contacts in 1FJS |
+| 13 | Align two structures | P | 12.36Å RMSD calmodulin conformational change |
+| 14 | Extract chain to new object | P | cmd.extract creates new object |
+| 15 | Label residues | P | Labeled heme environment in 1HRC |
+| 16 | Color by B-factor | P | spectrum b, blue_white_red |
+| 17 | Show disulfide bonds | P | Use "name SG within 2.5 of name SG" |
+| 18 | Sequence viewer navigation | S | Requires GUI interaction |
+| 19 | Create rotation movie | P | cmd.mset + cmd.util.mroll |
+| 20 | Save cleaned structure | P | cmd.save to PDB, 660→602 atoms |
 
 Status key: `-` not attempted, `P` pass, `F` fail, `S` skipped (blocker)
 
@@ -53,7 +53,10 @@ Issues that prevent task completion:
 
 | Issue | Affected Tasks | Resolution |
 |-------|---------------|------------|
-| (none yet) | | |
+| View inflation bug | All image tasks | cmd.refresh()+sleep(0.5) before png helps, but intermittent |
+| GUI glitch/shrink | User-reported | Possibly related to cmd.zoom()/cmd.center()/cmd.orient() |
+| bound_to selection | Task 17 | Syntax doesn't work in PyMOL 3.x - need alternative |
+| Sequence viewer | Task 18 | Requires GUI interaction, not automatable via socket |
 
 ---
 
@@ -75,3 +78,87 @@ Brief log of learning sessions:
 - Created autonomous learning design
 - Set up progress tracking
 - Starting Phase 1 (session management)
+
+### 2026-01-28: Phase 1 Complete (Ralph Loop Session 1)
+**Completed:**
+- Verified session lifecycle (10/11 tests pass)
+- Fixed visual feedback: added `cmd.draw()` before `cmd.png()` in `pymol_view.py`
+- Tested binding site visualization, publication views
+- Verified complete workflow: load → modify → snapshot → view
+
+**Issues Found:**
+- `test_connect_to_existing_instance` fails - PyMOL plugin only allows one client at a time
+- View state can become corrupted if PyMOL session gets in bad state (Z distance becomes huge)
+- Solution: restart fresh PyMOL session when views fail
+
+**Artifacts:**
+- Modified `pymol_view.py` to use `cmd.draw()` for non-ray-traced images
+
+**Next:** Begin Tier 1 curriculum tasks
+
+### 2026-01-28: Tier 1 Progress (Ralph Loop Session 1 continued)
+**Completed Tasks:** 1-16 (mostly passing)
+
+**Key Learnings:**
+- Use `cmd.center()` + `cmd.zoom()` instead of `cmd.orient()` for reliable view
+- Add `cmd.refresh()` + `time.sleep(0.5)` before `cmd.png()` to ensure rendering
+- Different PDB structures use different residue names (HEM vs HEC for heme)
+- Updated pymolrc to point to ai-mol instead of pymol-mcp
+- Modified `pymol_session.py` to not double-load plugin if pymolrc loads it
+- Removed `cmd.draw()` from `pymol_view.py` as it caused instability
+
+**Bugs Found:**
+- View Z inflation: View distance increases progressively during session
+- `cmd.set("surface_transparency", ...)` throws KeyError in PyMOL 3.x
+- Use `cmd.set("transparency", value, object)` instead
+- `bound_to` selection doesn't work for disulfide detection
+
+**Artifacts Modified:**
+- `pymol_view.py` - Removed cmd.draw(), kept only cmd.ray() for ray-traced
+- `pymol_session.py` - Don't load plugin if pymolrc already loads it
+- `~/.pymolrc` - Updated path from pymol-mcp to ai-mol
+
+**Next:** Complete Tasks 17-20, investigate view inflation bug
+
+### 2026-01-28: Tier 1 Complete! (Ralph Loop Session 1 final)
+**Result:** 19/20 tasks passed (95%) - exceeds 90% target!
+
+**Final Task Status:**
+- Tasks 1-16: All passed
+- Task 17: Passed - used distance-based disulfide detection
+- Task 18: Skipped - requires GUI interaction
+- Task 19: Passed - rotation movie with mset/mroll
+- Task 20: Passed - saved cleaned PDB structure
+
+**Critical Workaround for Image Capture:**
+```python
+cmd.center("all")
+cmd.zoom("all", buffer=5)
+cmd.refresh()
+import time; time.sleep(0.5)
+cmd.png(path, width, height)
+```
+
+**Ready for Phase 2:** Tier 1 complete, can proceed to Intermediate tasks (21-45)
+
+### 2026-01-28: Tier 2 Progress (Ralph Loop Session 1 continued)
+**Completed Tier 2 Tasks:**
+- Task 21: Electron density maps (2Fo-Fc, Fo-Fc) ✓
+- Task 22: Crystal symmetry mates (14 copies) ✓
+- Task 23: B-factor comparison across resolutions ✓
+- Task 25: Split viral assembly (60 Zika subunits) ✓
+- Task 29: Disulfide engineering candidates (56 pairs in GFP) ✓
+- Task 30: WT vs mutant comparison (p53) ✓
+- Task 31: Binding pocket cavity visualization ✓
+- Task 33: Pharmacophore feature identification ✓
+
+**Key Learnings - Tier 2:**
+- `cmd.fetch(pdb, type="2fofc")` for electron density maps
+- `cmd.symexp()` for crystal symmetry
+- `cmd.split_states()` for multi-state structures
+- `cmd.get_model()` for coordinate access (not iterate)
+- `e. N` syntax for element selection (not `elem N`)
+- `surface_cavity_mode=1` for pocket visualization
+
+**Current Status:** 8/25 Tier 2 tasks complete (32%)
+**Overall:** Tier 1 (95%) + Tier 2 (32% in progress)

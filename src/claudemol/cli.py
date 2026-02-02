@@ -138,7 +138,7 @@ Commands:
   info      Show installation info
 
 For Claude Code skills, install the claudemol-skills plugin:
-  /plugin marketplace add ANaka/ai-mol?path=claude-plugin
+  /plugin marketplace add ANaka/claudemol?path=claude-plugin
   /plugin install claudemol-skills
 """,
     )

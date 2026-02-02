@@ -4,7 +4,7 @@ Visual feedback helper for PyMOL.
 Provides a simple way to execute commands and save/view the result.
 
 Usage:
-    from ai_mol.view import pymol_view
+    from claudemol.view import pymol_view
 
     # Execute commands and save a snapshot
     path = pymol_view("cmd.fetch('1ubq'); cmd.show('cartoon')", name="ubq_cartoon")
@@ -21,7 +21,7 @@ from pathlib import Path
 
 DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 9880
-SCRATCH_DIR = Path.home() / ".ai-mol" / "scratch"
+SCRATCH_DIR = Path.home() / ".claudemol" / "scratch"
 
 
 def ensure_scratch_dir():

@@ -5,7 +5,19 @@ description: Use when connecting Claude to PyMOL, troubleshooting socket errors,
 
 # PyMOL Setup
 
-Set up Claude Code to work with PyMOL, including installing open-source PyMOL if needed.
+Set up Claude Code to work with PyMOL.
+
+## Quick Setup (Recommended)
+
+```bash
+pip install claudemol
+claudemol setup
+```
+
+This:
+1. Installs the claudemol package
+2. Configures `~/.pymolrc` to auto-load the socket plugin
+3. Reports status
 
 ## What This Does
 
@@ -122,6 +134,15 @@ python3 -m pymol --version
 
 ## Step 3: Configure pymolrc
 
+The easiest way is to use the claudemol CLI:
+
+```bash
+pip install claudemol
+claudemol setup
+```
+
+### Manual Configuration
+
 PyMOL looks for startup scripts in these locations:
 - `~/.pymolrc.py` (Python script - takes precedence)
 - `~/.pymolrc` (PyMOL commands)
@@ -132,25 +153,20 @@ Check existing config:
 ls -la ~/.pymolrc.py ~/.pymolrc 2>/dev/null || echo "No pymolrc found"
 ```
 
-The plugin path is: `<this-repo>/claude_socket_plugin.py`
+Find the plugin path:
 
-### If ~/.pymolrc.py exists
-
-Append to the file:
 ```python
-# Claude Code socket plugin
-run /absolute/path/to/ai-mol/claude_socket_plugin.py
+from claudemol.connection import get_plugin_path
+print(get_plugin_path())
 ```
 
-### If no pymolrc exists (or only ~/.pymolrc)
-
-Create or append to `~/.pymolrc`:
+Add to `~/.pymolrc`:
 ```
-# Claude Code socket plugin
-run /absolute/path/to/ai-mol/claude_socket_plugin.py
+# claudemol: Claude Code socket plugin
+run /path/to/plugin.py
 ```
 
-**Important:** Use the actual absolute path to `claude_socket_plugin.py` in this repository.
+**Important:** Use the actual absolute path from `get_plugin_path()`.
 
 ## Step 4: Test Connection
 
@@ -167,12 +183,10 @@ python3 -m pymol &
 pymol &
 ```
 
-Wait a few seconds for startup, then test connection using the Python module in this repo:
+Wait a few seconds for startup, then test connection:
 
 ```python
-import sys
-sys.path.insert(0, '/path/to/ai-mol')
-from pymol_connection import PyMOLConnection
+from claudemol import PyMOLConnection
 
 conn = PyMOLConnection()
 if conn.connect():
@@ -216,7 +230,7 @@ The pymol-open-source-whl package doesn't install a `pymol` command. Solutions:
 ### pymolrc not loading
 - Ensure the path in pymolrc is absolute, not relative
 - Check file permissions on the plugin
-- Try running the plugin manually in PyMOL console: `run /path/to/claude_socket_plugin.py`
+- Run `claudemol setup` to auto-configure
 
 ### PyQt5/GUI issues
 If PyMOL launches but GUI is broken:

@@ -195,7 +195,7 @@ def launch_pymol(file_path=None, wait_for_socket=True, timeout=10.0):
     if not pymol_cmd:
         raise RuntimeError(
             "PyMOL not found. Please install PyMOL:\n"
-            "  - Run: ai-mol setup\n"
+            "  - Run: claudemol setup\n"
             "  - Or: pip install pymol-open-source-whl\n"
             "  - Or: brew install pymol (macOS)"
         )

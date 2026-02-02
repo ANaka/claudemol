@@ -14,9 +14,7 @@ When user wants to work with PyMOL (e.g., "open PyMOL", "load 1abc.pdb", "show m
 ### 1. Try Connecting to Existing Instance
 
 ```python
-import sys
-sys.path.insert(0, '/path/to/ai-mol')  # Use actual repo path
-from pymol_connection import PyMOLConnection
+from claudemol import PyMOLConnection
 
 conn = PyMOLConnection()
 try:
@@ -29,7 +27,7 @@ except:
 ### 2. Launch PyMOL if Needed
 
 ```python
-from pymol_connection import launch_pymol, PyMOLConnection
+from claudemol import launch_pymol, PyMOLConnection
 
 process = launch_pymol()  # or launch_pymol("file.pdb")
 conn = PyMOLConnection()

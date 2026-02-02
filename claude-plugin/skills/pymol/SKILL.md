@@ -9,10 +9,16 @@ Launch PyMOL with Claude socket plugin and establish connection.
 
 ## Execution
 
-Run from the ai-mol repo root:
+```python
+from claudemol import launch_pymol, PyMOLConnection
 
-```bash
-python launch_pymol.py
+# Launch PyMOL (waits for socket to be ready)
+process = launch_pymol()
+
+# Connect
+conn = PyMOLConnection()
+conn.connect()
+print("PyMOL is running and connected")
 ```
 
 ## After Launch
@@ -27,17 +33,20 @@ Offer next steps:
 
 ## Sending Commands
 
-Use `pymol_cmd.py` to send commands:
-
-```bash
+```python
 # Fetch a structure
-python pymol_cmd.py "fetch 1ubq"
+conn.execute("cmd.fetch('1ubq')")
 
 # Multiple commands
-python pymol_cmd.py "hide everything; show cartoon; color spectrum; orient"
+conn.execute("""
+cmd.hide('everything')
+cmd.show('cartoon')
+cmd.color('spectrum')
+cmd.orient()
+""")
 
 # Get object names
-python pymol_cmd.py "print(cmd.get_names())"
+result = conn.execute("print(cmd.get_names())")
 ```
 
 ## If Connection Fails

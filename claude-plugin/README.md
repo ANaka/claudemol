@@ -1,23 +1,23 @@
-# ai-mol Skills for Claude Code
+# claudemol Skills for Claude Code
 
 PyMOL visualization skills for Claude Code.
 
 ## Installation
 
 ```bash
-/plugin marketplace add ANaka/ai-mol?path=claude-plugin
-/plugin install ai-mol-skills
+/plugin marketplace add ANaka/claudemol?path=claude-plugin
+/plugin install claudemol-skills
 ```
 
 Then restart Claude Code.
 
 ## Prerequisites
 
-You need the `ai-mol` pip package installed:
+You need the `claudemol` pip package installed:
 
 ```bash
-pip install ai-mol
-ai-mol setup
+pip install claudemol
+claudemol setup
 ```
 
 ## Available Skills
